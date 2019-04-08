@@ -280,7 +280,7 @@ class BudgetsTable extends Component {
                   actionConsts.ACTION_TYPE_SINGLE_SELECTION,
                   data,
                 );
-                this.props.toggleView();
+               // this.props.toggleView();
               }}
             >
               {text}
