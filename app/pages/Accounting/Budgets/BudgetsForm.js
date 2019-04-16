@@ -61,6 +61,7 @@ class BudgetsForm extends Component {
       data: newObject,
       isExistMessage: '',
       commentsData: [],
+      budget:[],
       enableSaveButtonValue: false,
       visible: false,
       visible1: false,
@@ -70,18 +71,18 @@ class BudgetsForm extends Component {
       visible8: false,
       invoiceData: [],
       invoiceId: '',
-      key: 'Invoice (Edit)',
+      key: 'Budget (Edit)',
       activeKey: '2',
       down: false,
       tagsFromServer: [
        
         'Status To Approved',
         'Status To Reviewed',
-        'Status To Rejected ',
+        'Status To Rejected',
        
       ],
       selectedTags: [],
-      InvoiceItem: [],
+      Item: [],
       InvoiceTerm: [],
       invoiceItemUpdate: false,
       invoiceRoleUpdate: false,
@@ -89,6 +90,12 @@ class BudgetsForm extends Component {
       disabled: false,
       disabled1: false,
       value: 1,
+      budgetId : '',
+      budgetItemSeqId : '',
+      partyId : '',
+      Role : [],
+      Reviews : [],
+      budgetReviewId:''
     };
   }
   showDrawer6 = () => {
@@ -123,25 +130,42 @@ class BudgetsForm extends Component {
   };
   handleChange = (tag, checked) => {
     const { selectedTags } = this.state;
-    if (tag === 'Copy') {
+    console.log(tag);
+    if (tag === 'Status To Approved') {
       var obj = {
-        invoiceIdToCopyFrom: this.state.invoiceId,
+        budgetId: this.state.budgetId,
+        statusId: 'BG_APPROVED',
       };
       this.props.handleSubmitAction(
-        actionConsts.ACTION_TYPE_SAVE_COPY_INVOICE,
+        actionConsts.ACTION_TYPE_UPDATE_BUDGET_STATUS,
         obj,
       );
-    } else {
-      var obj = {
-        invoiceId: this.state.invoiceId,
-        statusId: 'INVOICE_APPROVED',
-      };
-      this.props.handleSubmitAction(
-        actionConsts.ACTION_TYPE_SAVE_SET_INVOICE_STATUS,
-        obj,
-      );
-    }
+    
+  }
+  if (tag === 'Status To Reviewed') {
+    var obj = {
+      budgetId: this.state.budgetId,
+      statusId: 'BG_REVIEWED',
+    };
+    this.props.handleSubmitAction(
+      actionConsts.ACTION_TYPE_UPDATE_BUDGET_STATUS,
+      obj,
+    );
+}
+if (tag === 'Status To Rejected') {
+  var obj = {
+    budgetId: this.state.budgetId,
+    statusId: 'BG_REJECTED',
   };
+  this.props.handleSubmitAction(
+    actionConsts.ACTION_TYPE_UPDATE_BUDGET_STATUS,
+    obj,
+  );
+  
+
+}
+     
+}
   showDrawer = () => {
     this.setState({
       visible: true,
@@ -201,21 +225,27 @@ class BudgetsForm extends Component {
     if (nextProps.currentAction == 'view') {
       this.setState({ disabled: false, disabled1: true, activeKey: '1' });
     }
-    if (nextProps.InvoiceItem != undefined) {
+    if (nextProps.Item != undefined) {
       var tmp = [];
-      tmp.push({ InvoiceItemSeqId: nextProps.InvoiceItem.invoiceItemSeqId });
-      this.setState({ InvoiceItem: tmp });
+      tmp.push({ budgetItemSeqId: nextProps.Item.budgetItemSeqId });
+      this.setState({ Item: tmp,budgetItemSeqId:nextProps.Item.budgetItemSeqId });
+    }
+    if (nextProps.Reviews != undefined) {
+      var tmp = [];
+      tmp.push({ budgetReviewId: nextProps.Reviews.budgetReviewId });
+      this.setState({ Reviews: tmp,budgetReviewId : nextProps.Reviews.budgetReviewId});
     }
     if (nextProps.data != undefined) {
       var tmp = [];
-      tmp.push({ invoiceId: nextProps.data.invoiceId });
-      this.setState({ invoiceData: tmp, invoiceId: nextProps.data.invoiceId });
+      tmp.push({ budgetId: nextProps.data.budgetId });
+      this.setState({ budget: tmp, budgetId: nextProps.data.budgetId });
     }
-    if (nextProps.InvoiceRole != undefined) {
+    if (nextProps.Role!= undefined) {
       var tmp = [];
-      tmp.push({ invoiceId: nextProps.InvoiceRole });
-      this.setState({ InvoiceRole: tmp });
+      tmp.push({ partyId: this.state.partyId });
+      this.setState({ Role: tmp });
     }
+    
     if (nextProps.InvoiceTerm != undefined) {
       var tmp = [];
       tmp.push({ invoiceTermId: nextProps.InvoiceTerm.invoiceTermId });
@@ -289,117 +319,62 @@ class BudgetsForm extends Component {
         const key = this.state.key;
         if (activeKey === '2') {
           var obj = {
-            invoiceTypeId: values.invoiceTypeId,
-            partyIdFrom: 'Company',
-            partyId: values.partyId,
+            budgetTypeId: values.budgetTypeId,
+            customTimePeriodId: values.customTimePeriodId,
+            comments: values.comments,
           };
           this.props.handleSubmitAction(actionConsts.ACTION_TYPE_SAVE, obj);
         }
         if (activeKey === '1') {
-          if (key === 'Invoice (Edit)') {
+          if (key === 'Budget (Edit)') {
             var obj = {
-              invoiceId: this.state.invoiceId,
+              budgetId : this.state.budgetId,
+              budgetTypeId: values.budgetTypeId,
+              customTimePeriodId: values.customTimePeriodId,
+              comments: values.comments,
             };
             this.props.handleSubmitAction(
-              actionConsts.ACTION_TYPE_UPDATE_INVOICE,
+              actionConsts.ACTION_TYPE_UPDATE,
               obj,
             );
           }
-          if (key === 'Invoice Item') {
+          if (key === 'Item') {
             var obj = {
-              invoiceId: this.state.invoiceId,
-              invoiceItemTypeId: values.invoiceItemTypeId,
-              overrideGlAccountId: values.overrideGlAccountId,
-              overrideOrgPartyId: values.overrideOrgPartyId,
-              inventoryItemId: values.inventoryItemId,
-              productId: values.productId,
-              productFeatureId: values.productFeatureId,
-              parentInvoiceId: values.parentInvoiceId,
-              parentInvoiceItemSeqId: values.parentInvoiceItemSeqId,
-              uomId: values.uomId,
-              taxableFlag: values.taxableFlag,
-              quantity: values.quantity,
+              budgetId : this.state.budgetId,
+              budgetItemTypeId: values.budgetItemTypeId,
               amount: values.amount,
-              description: values.description,
-              taxAuthPartyId: values.taxAuthPartyId,
-              taxAuthGeoId: values.taxAuthGeoId,
-              taxAuthorityRateSeqId: values.taxAuthorityRateSeqId,
-              salesOpportunityId: values.salesOpportunityId,
+              purpose: values.purpose,
+              justification : values.justification
             };
             this.props.handleSubmitAction(
-              actionConsts.ACTION_TYPE_SAVE_INVOICE_ITEM,
+              actionConsts.ACTION_TYPE_SAVE_ITEM,
               obj,
             );
           }
-          if (key === 'Invoice Item' && this.state.invoiceItemUpdate) {
+         
+          if (key === 'Roles') {
             var obj = {
-              invoiceId: this.state.invoiceId,
-              invoiceItemTypeId: values.invoiceItemTypeId,
-              overrideGlAccountId: values.overrideGlAccountId,
-              overrideOrgPartyId: values.overrideOrgPartyId,
-              inventoryItemId: values.inventoryItemId,
-              productId: values.productId,
-              productFeatureId: values.productFeatureId,
-              parentInvoiceId: values.parentInvoiceId,
-              parentInvoiceItemSeqId: values.parentInvoiceItemSeqId,
-              uomId: values.uomId,
-              taxableFlag: values.taxableFlag,
-              quantity: values.quantity,
-              amount: values.amount,
-              description: values.description,
-              taxAuthPartyId: values.taxAuthPartyId,
-              taxAuthGeoId: values.taxAuthGeoId,
-              taxAuthorityRateSeqId: values.taxAuthorityRateSeqId,
-              salesOpportunityId: values.salesOpportunityId,
-            };
-            this.props.handleSubmitAction(
-              actionConsts.ACTION_TYPE_U_INVOICE_ITEM,
-              obj,
-            );
-          }
-          if (key === 'Invoice Roles') {
-            var obj = {
-              invoiceId: this.state.invoiceId,
-              partyId: values.Party_ID,
+              budgetId: this.state.budgetId,
+              partyId: values.partyId,
               roleTypeId: 'CUSTOMER',
-              datetimePerformed: moment(values.datetimePerformed).format(
-                'YYYY-MM-DD',
-              ),
-              percentage: values.Percentage,
             };
+            this.setState({partyId:obj.partyId});
             this.props.handleSubmitAction(
-              actionConsts.ACTION_TYPE_SAVE_INVOICE_ROLES,
+              actionConsts.ACTION_TYPE_SAVE_ROLES,
               obj,
             );
           }
-          if (key === 'Invoice Roles' && this.state.invoiceRoleUpdate) {
+          if (key === 'Reviews') {
             var obj = {
-              invoiceId: this.state.invoiceId,
-              partyId: values.Party_ID,
-              roleTypeId: 'CUSTOMER',
-              datetimePerformed: moment(values.datetimePerformed).format(
-                'YYYY-MM-DD',
-              ),
-              percentage: values.Percentage,
+              budgetId: this.state.budgetId,
+              partyId: values.partyId,
+              budgetReviewResultTypeId:'BGR_ACCEPTED',
+              // reviewDate: values.reviewDate,
+
             };
+            this.setState({partyId : obj.partyId});
             this.props.handleSubmitAction(
-              actionConsts.ACTION_TYPE_UPDATE_INVOICE_ROLES,
-              obj,
-            );
-          }
-          if (key === 'Invoice Terms') {
-            var obj = {
-              invoiceId: this.state.invoiceId,
-              termTypeId: values.TermTypeId,
-              invoiceItemSeqId: '',
-              termValue: values.TermValue,
-              termDays: values.TermDays,
-              textValue: values.TextValue,
-              description: values.Description,
-              uomId: values.Uom,
-            };
-            this.props.handleSubmitAction(
-              actionConsts.ACTION_TYPE_SAVE_INVOICE_TERMS,
+              actionConsts.ACTION_TYPE_SAVE_Reviews,
               obj,
             );
           }
@@ -481,11 +456,14 @@ class BudgetsForm extends Component {
   callback = key => {
     this.setState({ key: key });
   };
-  onChange = e => {
-    this.setState({
-      value: e.target.value,
-    });
-  };
+  // onChange = e => {
+  //   this.setState({
+  //     value: e.target.value,
+  //   });
+  // };
+  onChange(date, dateString) {
+    console.log(date, dateString);
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
     const { currentAction } = this.props;
@@ -540,88 +518,102 @@ class BudgetsForm extends Component {
     ];
     const tableColumns7 = [
       {
-        title: `${localConsts.ProductFeatureTypeId}`,
+        title: `${localConsts.CustomTimePeriodId}`,
         dataIndex: 'ProductFeatureTypeId',
         id: 'Billing_Acct_ID',
       },
       {
-        title: `${localConsts.ProductFeatureCategoryId}`,
+        title: `${localConsts.ParentPeriodId}`,
         dataIndex: 'ProductFeatureCategoryId',
         id: 'Description',
       },
       {
-        title: `${localConsts.UOM}`,
+        title: `${localConsts.PeriodTypeId}`,
         dataIndex: 'UOM',
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.NumberSpecified}`,
+        title: `${localConsts.PeriodNum}`,
         dataIndex: 'NumberSpecified',
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.DefaultAmount}`,
+        title: `${localConsts.PeriodName}`,
         dataIndex: 'DefaultAmount',
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.DefaultSequenceNum}`,
+        title: `${localConsts.FromDate_LABEL}`,
         dataIndex: 'DefaultSequenceNum',
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.Abbrev}`,
+        title: `${localConsts.ThroughDate_LABEL}`,
         dataIndex: 'Abbrev',
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.IdCode}`,
+        title: `${localConsts.IsClosed}`,
         dataIndex: 'IdCode',
         id: 'ext_acc_id',
       },
     ];
     const tableColumns4 = [
       {
-        title: `${localConsts.InvoiceTermId}`,
-        dataIndex: 'invoiceTermId',
-        key: 'invoiceTermId',
-        width: 100,
-        fixed: 'left',
+        title: `${localConsts.BudgetReviewId}`,
+        dataIndex: 'budgetReviewId',
+        key: 'budgetReviewId',
+        // fixed: 'left',
       },
       {
-        title: `${localConsts.TermTypeId}`,
+        title: `${localConsts.PartyID_LABEL}`,
         dataIndex: 'Description',
         id: 'Description',
       },
       {
-        title: `${localConsts.ItemNo}`,
+        title: `${localConsts.COLUMN_Name}`,
         dataIndex: 'Billing_Acct_ID',
         id: 'Billing_Acct_ID',
       },
       {
-        title: `${localConsts.TermValue}`,
+        title: `${localConsts.BudgetReviewResult}`,
         dataIndex: 'ext_acc_id',
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.TermDays}`,
+        title: `${localConsts.ReviewDate}`,
         dataIndex: 'ext_acc_id',
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.TextValue}`,
-        dataIndex: 'ext_acc_id',
-        id: 'ext_acc_id',
-      },
-      {
-        title: `${localConsts.Description}`,
-        dataIndex: 'ext_acc_id',
-        id: 'ext_acc_id',
-      },
-      {
-        title: `${localConsts.Uom}`,
-        dataIndex: 'ext_acc_id',
-        id: 'ext_acc_id',
+        title: `${localConsts.COLUMN_ACTIONS}`,
+        render: data => (
+          <div>
+            &emsp;
+            <Popconfirm
+              title={localConsts.POPCONFIRM_TITLE}
+              icon={<Icon type="question" style={{ color: 'red' }} />}
+              okText={localConsts.POPCONFIRM_OK_TEXT}
+              okType="danger"
+              cancelText={localConsts.POPCONFIRM_CANCEL_TEXT}
+              placement={localConsts.POPCONFIRM_PLACEMENT}
+              onConfirm={() => {
+                var obj = {
+                  budgetId: this.state.budgetId,
+                  budgetReviewId: this.state.budgetReviewId,
+                  partyId: this.state.partyId,
+                  budgetReviewResultTypeId : 'BGR_ACCEPTED'
+                };
+                this.props.handleSubmitAction(
+                  actionConsts.ACTION_TYPE_REMOVE_Reviews,
+                  obj,
+                );
+              }}
+            >
+              <Icon type="delete" className={styles.icon} />
+            </Popconfirm>&emsp;
+          </div>
+        ),
       },
     ];
     const tableColumns0 = [
@@ -653,45 +645,49 @@ class BudgetsForm extends Component {
     ];
     const tableColumns10 = [
       {
-        title: `${localConsts.CustomTimePeriodId}`,
+        title: `${localConsts.PartyID}`,
         dataIndex: 'Party_ID',
         id: 'Party_ID',
       },
       {
-        title: `${localConsts.ParentPeriodId}`,
+        title: `${localConsts.COLUMN_Name}`,
         dataIndex: 'Party_Type_Id',
         id: 'Party_Type_Id',
       },
       {
-        title: `${localConsts.PeriodTypeId}`,
+        title: `${localConsts.RoleTypeId_LABEL}`,
         dataIndex: 'First_name',
         id: 'First_name',
       },
       {
-        title: `${localConsts.PeriodNum}`,
-        dataIndex: 'Last_name',
-        id: 'Last_name',
+        title: `${localConsts.COLUMN_ACTIONS}`,
+        render: data => (
+          <div>
+            &emsp;
+            <Popconfirm
+              title={localConsts.POPCONFIRM_TITLE}
+              icon={<Icon type="question" style={{ color: 'red' }} />}
+              okText={localConsts.POPCONFIRM_OK_TEXT}
+              okType="danger"
+              cancelText={localConsts.POPCONFIRM_CANCEL_TEXT}
+              placement={localConsts.POPCONFIRM_PLACEMENT}
+              onConfirm={() => {
+                var obj = {
+                  invoiceItemSeqId: data.InvoiceItemSeqId,
+                  invoiceId: this.state.invoiceId,
+                };
+                this.props.handleSubmitAction(
+                  actionConsts.ACTION_TYPE_INVOICE_ITEM_DELETE,
+                  obj,
+                );
+              }}
+            >
+              <Icon type="delete" className={styles.icon} />
+            </Popconfirm>&emsp;
+          </div>
+        ),
       },
-      {
-        title: `${localConsts.PeriodName}`,
-        dataIndex: 'Group_Name',
-        id: 'Group_Name',
-      },
-      {
-        title: `${localConsts.FromDate_LABEL}`,
-        dataIndex: 'Group_Name',
-        id: 'Group_Name',
-      },
-      {
-        title: `${localConsts.ThroughDate_LABEL}`,
-        dataIndex: 'Group_Name',
-        id: 'Group_Name',
-      },
-      {
-        title: `${localConsts.IsClosed}`,
-        dataIndex: 'Group_Name',
-        id: 'Group_Name',
-      },
+      
 
     ];
     const tableColumns1 = [
@@ -752,18 +748,14 @@ class BudgetsForm extends Component {
     ];
     const tableColumns2 = [
       {
-        title: `${localConsts.COLUMN_ItemNo}`,
-        width: 300,
-        dataIndex: 'InvoiceItemSeqId',
-        id: 'InvoiceItemSeqId',
+        title: `${localConsts.BudgetItemSeqId}`,
+        dataIndex: 'budgetItemSeqId',
+        id: 'budgetItemSeqId',
         render: (text, data) => {
           return (
             <Button
               className={styles.anchorNameStyle}
-              onClick={() => {
-                this.setState({ invoiceItemUpdate: true });
-                this.showDrawer();
-              }}
+             
             >
               {text}
             </Button>
@@ -771,37 +763,22 @@ class BudgetsForm extends Component {
         },
       },
       {
-        title: `${localConsts.COLUMN_Quantity}`,
+        title: `${localConsts.BudgetItemTypeId}`,
         dataIndex: 'Description',
         id: 'Description',
       },
       {
-        title: `${localConsts.COLUMN_InvoiceItemType}`,
+        title: `${localConsts.COLUMN_Amount}`,
         dataIndex: 'ext_acc_id',
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.COLUMN_ProductId}`,
+        title: `${localConsts.Purpose}`,
         dataIndex: 'ext_acc_id',
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.COLUMN_Description}`,
-        dataIndex: 'ext_acc_id',
-        id: 'ext_acc_id',
-      },
-      {
-        title: `${localConsts.COLUMN_OverrideGlAccountId}`,
-        dataIndex: 'ext_acc_id',
-        id: 'ext_acc_id',
-      },
-      {
-        title: `${localConsts.COLUMN_UnitPrice}`,
-        dataIndex: 'ext_acc_id',
-        id: 'ext_acc_id',
-      },
-      {
-        title: `${localConsts.COLUMN_Total}`,
+        title: `${localConsts.Justification}`,
         dataIndex: 'ext_acc_id',
         id: 'ext_acc_id',
       },
@@ -819,11 +796,11 @@ class BudgetsForm extends Component {
               placement={localConsts.POPCONFIRM_PLACEMENT}
               onConfirm={() => {
                 var obj = {
-                  invoiceItemSeqId: data.InvoiceItemSeqId,
-                  invoiceId: this.state.invoiceId,
+                  budgetItemSeqId: this.state.budgetItemSeqId,
+                  budgetId: this.state.budgetId,
                 };
                 this.props.handleSubmitAction(
-                  actionConsts.ACTION_TYPE_INVOICE_ITEM_DELETE,
+                  actionConsts.ACTION_TYPE_ITEM_DELETE,
                   obj,
                 );
               }}
@@ -837,16 +814,15 @@ class BudgetsForm extends Component {
     const tableColumns3 = [
       {
         title: `${localConsts.COLUMN_PartyID}`,
-        width: 300,
-        dataIndex: 'InvoiceItemSeqId',
-        id: 'InvoiceItemSeqId',
+        dataIndex: 'partyId',
+        id: 'partyId',
         render: (text, data) => {
           return (
             <Button
               className={styles.anchorNameStyle}
               onClick={() => {
-                this.setState({ invoiceRoleUpdate: true });
-                this.showDrawer2();
+                // this.setState({ invoiceRoleUpdate: true });
+                // this.showDrawer2();
               }}
             >
               {text}
@@ -865,16 +841,6 @@ class BudgetsForm extends Component {
         id: 'ext_acc_id',
       },
       {
-        title: `${localConsts.COLUMN_Percentage}`,
-        dataIndex: 'ext_acc_id',
-        id: 'ext_acc_id',
-      },
-      {
-        title: `${localConsts.COLUMN_DateTimePerformed}`,
-        dataIndex: 'ext_acc_id',
-        id: 'ext_acc_id',
-      },
-      {
         render: data => (
           <div>
             &emsp;
@@ -887,12 +853,12 @@ class BudgetsForm extends Component {
               placement={localConsts.POPCONFIRM_PLACEMENT}
               onConfirm={() => {
                 var obj = {
-                  partyId: '10000',
-                  roleTypeId: 'ACCOUNT',
-                  invoiceId: this.state.invoiceId,
+                  partyId: this.state.partyId,
+                  roleTypeId: 'CUSTOMER',
+                  budgetId: this.state.budgetId,
                 };
                 this.props.handleSubmitAction(
-                  actionConsts.ACTION_TYPE_INVOICE_ROLE_DELETE,
+                  actionConsts.ACTION_TYPE_ROLE_DELETE,
                   obj,
                 );
               }}
@@ -927,7 +893,7 @@ class BudgetsForm extends Component {
                     <Row style={{ marginTop: '15px' }}>
                       <Col span={7}>
                         <FormItem label={localConsts.BudgetTypeId}>
-                          {getFieldDecorator('OrganizationPartyId_', {
+                          {getFieldDecorator('budgetTypeId', {
                             initialValue: data.partyIdFrom,
                             enableReinitialize: true,
                           })(
@@ -949,7 +915,7 @@ class BudgetsForm extends Component {
                       </Col>
                       <Col span={7} offset={1}>
                         <FormItem label={localConsts.CustomTimePeriodId}>
-                          {getFieldDecorator('partyId', {
+                          {getFieldDecorator('customTimePeriodId', {
                             initialValue: data.partyId,
                             enableReinitialize: true,
                           })(
@@ -958,7 +924,7 @@ class BudgetsForm extends Component {
                               onBlur={this.enableSaveButton}
                               addonAfter={
                                 <Icon
-                                  onClick={this.showDrawer2}
+                                  onClick={this.showDrawer8}
                                   type="idcard"
                                 />
                               }
@@ -970,7 +936,7 @@ class BudgetsForm extends Component {
                     <Row>
                       <Col span={6}>
                         <FormItem label={localConsts.Comments}>
-                          {getFieldDecorator('invoiceTypeId', {
+                          {getFieldDecorator('comments', {
                             initialValue: data.invoiceTypeId,
                             enableReinitialize: true,
                           })(
@@ -991,10 +957,10 @@ class BudgetsForm extends Component {
               disabled={this.state.disabled}
             >
               <Tabs tabPosition="left" onChange={this.callback}>
-                <TabPane tab="Invoice (Edit)" key="Invoice (Edit)">
+                <TabPane tab="Budget (Edit)" key="Budget (Edit)">
                   <div>
                     <Card
-                      title={<div>Invoice: {this.state.invoiceId}</div>}
+                      title={<div>Budget: {this.state.budgetId}</div>}
                       bordered={true}
                       extra={
                         <div>
@@ -1023,23 +989,10 @@ class BudgetsForm extends Component {
                         </div>
                       )}
                       <Row gutter={20} style={{ marginTop: '15px' }}>
+                    
                         <Col span={7}>
-                          <FormItem label={localConsts.BudgetId}>
-                            {getFieldDecorator('partyIdFrom', {
-                              initialValue: this.state.BudgetId,
-                              enableReinitialize: true,
-                            })(
-                              <Input
-                                style={{ width: '295px' }}
-                                onBlur={this.enableSaveButton}
-                                disabled
-                              />,
-                            )}
-                          </FormItem>
-                        </Col>
-                        <Col span={6} offset={2}>
                           <FormItem label={localConsts.BudgetTypeId}>
-                            {getFieldDecorator('partyId', {
+                            {getFieldDecorator('budgetTypeId', {
                               initialValue: data.partyId,
                               enableReinitialize: true,
                             })(
@@ -1063,7 +1016,7 @@ class BudgetsForm extends Component {
                       <Row gutter={20}>
                         <Col span={7}>
                           <FormItem label={localConsts.CustomTimePeriodId}>
-                            {getFieldDecorator('invoiceTypeId', {
+                            {getFieldDecorator('customTimePeriodId', {
                               initialValue: data.invoiceTypeId,
                               enableReinitialize: true,
                             })(
@@ -1072,7 +1025,7 @@ class BudgetsForm extends Component {
                               onBlur={this.enableSaveButton}
                               addonAfter={
                                 <Icon
-                                  onClick={this.showDrawer2}
+                                  onClick={this.showDrawer8}
                                   type="idcard"
                                 />
                               }
@@ -1080,13 +1033,13 @@ class BudgetsForm extends Component {
                             )}
                           </FormItem>
                         </Col>
-                        <Col span={6} offset={2}>
+                        <Col span={6} offset={3}>
                           <FormItem label={localConsts.Comments	}>
-                            {getFieldDecorator('invoiceDate', {
+                            {getFieldDecorator('comments', {
                               initialValue: '',
                               enableReinitialize: true,
                             })(
-                              <Input />
+                              <Input   style={{ width: '295px' }} />
                             )}
                           </FormItem>
                         </Col>
@@ -1119,17 +1072,16 @@ class BudgetsForm extends Component {
                     </Card>
                   </div>
                 </TabPane>
-                <TabPane tab="Invoice Item" key="Invoice Item">
+                <TabPane tab="Item" key="Item">
                   <Row style={{ marginTop: '14px' }}>
-                    <Col span={4} className={styles.copy}>
-                      {localConsts.ListAgreementItems}
-                    </Col>
+                   
                     <Col span={5} offset={15}>
                       <span
                         style={{ color: '#337AB7' }}
                         onClick={this.showDrawer}
                       >
-                        Create Invoice Item
+                            Add a new budget Item
+
                       </span>
                     </Col>
                   </Row>
@@ -1138,24 +1090,21 @@ class BudgetsForm extends Component {
                       <Table
                         className={styles.tableContainer}
                         columns={tableColumns2}
-                        dataSource={this.state.InvoiceItem}
+                        dataSource={this.state.Item}
                         size="small"
                         onChange={this.handleStandardTableChange}
                       />
                     </div>
                   </Row>
                 </TabPane>
-                <TabPane tab="Invoice Roles" key="Invoice Roles">
+                <TabPane tab="Roles" key="Roles">
                   <Row style={{ marginTop: '14px' }}>
-                    <Col span={4} className={styles.copy}>
-                      {localConsts.ListAgreementItems}
-                    </Col>
                     <Col span={5} offset={15}>
                       <span
                         style={{ color: '#337AB7' }}
                         onClick={this.showDrawer2}
                       >
-                        Create Invoice Roles
+                            Add a new Party Role
                       </span>
                     </Col>
                   </Row>
@@ -1164,24 +1113,22 @@ class BudgetsForm extends Component {
                       <Table
                         className={styles.tableContainer}
                         columns={tableColumns3}
-                        dataSource={this.state.InvoiceItem}
+                        dataSource={this.state.Role}
                         size="small"
                         onChange={this.handleStandardTableChange}
                       />
                     </div>
                   </Row>
                 </TabPane>
-                <TabPane tab="Invoice Terms" key="Invoice Terms">
+                <TabPane tab="Reviews" key="Reviews">
                   <Row style={{ marginTop: '14px' }}>
-                    <Col span={6} className={styles.copy}>
-                      {localConsts.ListAgreementItemTerms}
-                    </Col>
+                   
                     <Col span={6} offset={18}>
                       <span
                         style={{ color: '#337AB7' }}
                         onClick={this.showDrawer5}
                       >
-                        Create Invoice Term
+                           Add a new Budget Review
                       </span>
                     </Col>
                   </Row>
@@ -1191,303 +1138,83 @@ class BudgetsForm extends Component {
                         className={styles.tableContainer}
                         columns={tableColumns4}
                         scroll={{ x: 1300 }}
-                        dataSource={this.state.InvoiceTerm}
+                        dataSource={this.state.Reviews}
                         size="small"
                         onChange={this.handleStandardTableChange}
                       />
                     </div>
                   </Row>
                 </TabPane>
-                <TabPane
-                  tab="Send per Email"
-                  key="Email"
-                  className={styles.tabPaneCustom}
-                >
-                  <Row gutter={20} style={{ marginTop: '15px' }}>
-                    <Col span={11}>
-                      <FormItem label={localConsts.FromEmailAddress}>
-                        {getFieldDecorator('FromEmailAddress', {
-                          initialValue: '',
-                          enableReinitialize: true,
-                        })(
-                          <Input
-                            type="text"
-                            rows={4}
-                            style={{ width: '295px' }}
-                            onBlur={this.enableSaveButton}
-                          />,
-                        )}
-                      </FormItem>
-                    </Col>
-                    <Col span={11}>
-                      <FormItem label={localConsts.ToEmailAddress}>
-                        {getFieldDecorator('ToEmailAddress', {
-                          initialValue: '',
-                          enableReinitialize: true,
-                        })(
-                          <Input
-                            type="text"
-                            rows={4}
-                            style={{ width: '295px' }}
-                            onBlur={this.enableSaveButton}
-                          />,
-                        )}
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row gutter={20}>
-                    <Col span={11}>
-                      <FormItem label={localConsts.CopyEmailAddress}>
-                        {getFieldDecorator('CopyEmailAddress', {
-                          initialValue: '',
-                          enableReinitialize: true,
-                        })(
-                          <Input
-                            type="text"
-                            rows={4}
-                            style={{ width: '295px' }}
-                            onBlur={this.enableSaveButton}
-                          />,
-                        )}
-                      </FormItem>
-                    </Col>
-                    <Col span={11}>
-                      <FormItem label={localConsts.Subject}>
-                        {getFieldDecorator('Subject', {
-                          initialValue: '',
-                          enableReinitialize: true,
-                        })(
-                          <Input
-                            type="text"
-                            defaultValue="Please find attached invoice."
-                            rows={4}
-                            style={{ width: '295px' }}
-                            onBlur={this.enableSaveButton}
-                          />,
-                        )}
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row gutter={20}>
-                    <Col span={11}>
-                      <FormItem label={localConsts.EmailBody}>
-                        {getFieldDecorator('EmailBody', {
-                          initialValue: '',
-                          enableReinitialize: true,
-                        })(
-                          <Input
-                            type="text"
-                            rows={4}
-                            style={{ width: '295px' }}
-                            onBlur={this.enableSaveButton}
-                          />,
-                        )}
-                      </FormItem>
-                    </Col>
-                    <Col span={11}>
-                      <FormItem label={localConsts.OtherCurrency}>
-                        {getFieldDecorator('OtherCurrency', {
-                          initialValue: '',
-                          enableReinitialize: true,
-                        })(<Checkbox onChange={this.onChange} />)}
-                      </FormItem>
-                    </Col>
-                  </Row>
-                </TabPane>
-                <TabPane
-                  tab="Commission Run"
-                  key="Commission"
-                  className={styles.tabPaneCustom}
-                >
-                  <Row gutter={20} style={{ marginTop: '15px' }}>
-                    <Col span={11}>
-                      <FormItem label={localConsts.PartyID}>
-                        {getFieldDecorator('PartyID', {
-                          initialValue: data.invoiceTypeId,
-                          enableReinitialize: true,
-                        })(
-                          <Select
-                            showSearch
-                            style={{ width: '595px' }}
-                            optionFilterProp="children"
-                            filterOption={(input, option) =>
-                              option.props.children
-                                .toLowerCase()
-                                .indexOf(input.toLowerCase()) >= 0
-                            }
-                          >
-                            {InvoiceTypeConst}
-                          </Select>,
-                        )}
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row gutter={20} style={{ marginTop: '15px' }}>
-                    <Col span={11}>
-                      <FormItem label={localConsts.FromDate}>
-                        {getFieldDecorator('FromDate', {
-                          initialValue: moment(),
-                          enableReinitialize: true,
-                        })(
-                          <DatePicker
-                            style={{ width: '295px' }}
-                            onChange={this.onChange}
-                          />,
-                        )}
-                      </FormItem>
-                    </Col>
-                    <Col span={11} offset={1}>
-                      <FormItem label={localConsts.ThroughDate}>
-                        {getFieldDecorator('ThroughDate', {
-                          initialValue: moment(),
-                          enableReinitialize: true,
-                        })(
-                          <DatePicker
-                            style={{ width: '295px' }}
-                            onChange={this.onChange}
-                          />,
-                        )}
-                      </FormItem>
-                    </Col>
-                  </Row>
-                  <Row gutter={20} style={{ marginTop: '25' }}>
-                    <Col offset={10}>
-                      <Button type="primary">Find</Button>
-                    </Col>
-                  </Row>
-                </TabPane>
+             
               </Tabs>
             </TabPane>
           </Tabs>
           <Drawer
-            title={localConsts.NewTerms_title}
+            // title={localConsts.NewTerms_title}
             width="709px"
             closable={true}
             onClose={this.onClose5}
             visible={this.state.visible5}
           >
-            <Row gutter={20}>
+            <Row gutter={20} style={{marginTop:'35px'}}>
               <Col span={11}>
-                <FormItem label={localConsts.TermTypeId}>
-                  {getFieldDecorator('TermTypeId', {})(
-                    <Select
-                      showSearch
-                      style={{ width: '295px' }}
-                      value={this.state.termTypeId}
-                      onChange={this.handleChange1}
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      {InvoiceTypeConst}
-                    </Select>,
+                <FormItem label={localConsts.PartyID_LABEL}>
+                  {getFieldDecorator('partyId', {})(
+                    <Input
+                    style={{ width: '295px' }}
+                    onBlur={this.enableSaveButton}
+                    addonAfter={
+                      <Icon
+                        onClick={this.showDrawer4}
+                        type="idcard"
+                      />
+                    }
+                  />,
                   )}
                 </FormItem>
               </Col>
               <Col span={6} offset={2}>
-                <FormItem label={localConsts.ItemNo}>
-                  {getFieldDecorator('ItemNo', {
+                <FormItem label={localConsts.BudgetReviewResult}>
+                  {getFieldDecorator('budgetReviewResultTypeId', {
                     initialValue: '',
                     enableReinitialize: true,
                   })(
-                    <Input
-                      type="text"
-                      value={this.state.termDays}
-                      onChange={this.handleChange4}
-                      rows={4}
-                      style={{ width: '295px' }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={11}>
-                <FormItem label={localConsts.TermValue}>
-                  {getFieldDecorator('TermValue', {
-                    initialValue: '',
-                    enableReinitialize: true,
-                  })(
-                    <Input
-                      type="text"
-                      rows={4}
-                      style={{ width: '295px' }}
-                      value={this.state.termValue}
-                      onChange={this.handleChange3}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={6} offset={2}>
-                <FormItem label={localConsts.TermDays}>
-                  {getFieldDecorator('TermDays', {
-                    initialValue: '',
-                    enableReinitialize: true,
-                  })(
-                    <Input
-                      type="text"
-                      value={this.state.termDays}
-                      onChange={this.handleChange4}
-                      rows={4}
-                      style={{ width: '295px' }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={24}>
-                <FormItem label={localConsts.TextValue}>
-                  {getFieldDecorator('TextValue', {})(
-                    <Input.TextArea
-                      type="text"
-                      value={this.state.textValue}
-                      onChange={this.handleChange7}
-                      rows={4}
-                      style={{ width: '795px' }}
-                    />,
-                  )}
-                </FormItem>{' '}
-              </Col>
-              <Col span={24}>
-                <FormItem label={localConsts.Description}>
-                  {getFieldDecorator('Description', {})(
-                    <Input.TextArea
-                      type="text"
-                      value={this.state.description}
-                      onChange={this.handleChange8}
-                      rows={4}
-                      style={{ width: '795px' }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={11}>
-                <FormItem label={localConsts.Uom}>
-                  {getFieldDecorator('Uom', {})(
                     <Select
-                      showSearch
-                      style={{ width: '295px' }}
-                      value={this.state.termTypeId}
-                      onChange={this.handleChange1}
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      {InvoiceTypeConst}
-                    </Select>,
+                    showSearch
+                    style={{ width: '295px' }}
+                    value={this.state.termTypeId}
+                    onChange={this.handleChange1}
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option.props.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    {}
+                  </Select>,
                   )}
                 </FormItem>
               </Col>
             </Row>
+            <Row gutter={20}>
+              <Col span={11}>
+                <FormItem label={localConsts.ReviewDate}>
+                {getFieldDecorator('reviewDate', {
+                          initialValue: moment(),
+                          enableReinitialize: true,
+                        })(
+                          <DatePicker
+                            style={{ width: '295px' }}
+                            onChange={this.onChange}
+                          />,
+                        )}
+                </FormItem>
+              </Col>
+              
+            </Row>
+            
+           
             <Row
               style={{
                 borderTop: '1px dashed #E3E7F1',
@@ -1513,10 +1240,10 @@ class BudgetsForm extends Component {
             onClose={this.onClose}
             visible={this.state.visible}
           >
-            <Row gutter={20} style={{ marginTop: '15' }}>
+            <Row gutter={20} style={{ marginTop: '30px' }}>
               <Col span={11}>
-                <FormItem label={localConsts.COLUMN_InvoiceItemType}>
-                  {getFieldDecorator('invoiceItemTypeId', {})(
+                <FormItem label={localConsts.BudgetItemTypeId}>
+                  {getFieldDecorator('budgetItemTypeId', {})(
                     <Select
                       showSearch
                       style={{ width: '295px' }}
@@ -1533,124 +1260,38 @@ class BudgetsForm extends Component {
                 </FormItem>
               </Col>
               <Col span={8} offset={2}>
-                <FormItem label={localConsts.COLUMN_UOM}>
-                  {getFieldDecorator('uomId', {})(
-                    <Select
-                      showSearch
-                      style={{ width: '295px' }}
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      {InvoiceTypeConst}
-                    </Select>,
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={11}>
-                <FormItem label={localConsts.COLUMN_OverrideGlAccountId}>
-                  {getFieldDecorator('overrideGlAccountId', {})(
-                    <Select
-                      showSearch
-                      style={{ width: '295px' }}
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      {InvoiceTypeConst}
-                    </Select>,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={8} offset={2}>
-                <FormItem label={localConsts.COLUMN_TaxableFlag}>
-                  {getFieldDecorator('taxableFlag', {})(
-                    <Select
-                      showSearch
-                      style={{ width: '295px' }}
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      {InvoiceTypeConst}
-                    </Select>,
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={11}>
-                <FormItem label={localConsts.COLUMN_Quantity}>
-                  {getFieldDecorator('quantity', {})(
-                    <Input style={{ width: '290px' }} type="text" />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={8} offset={2}>
-                <FormItem label={localConsts.COLUMN_UnitPrice}>
+                <FormItem label={localConsts.COLUMN_Amount}>
                   {getFieldDecorator('amount', {})(
-                    <Input style={{ width: '290px' }} type="text" />,
+                   <Input
+                   type="text"
+                   style={{ width: '295px' }}
+                 />,
                   )}
                 </FormItem>
               </Col>
             </Row>
             <Row gutter={20}>
               <Col span={11}>
-                <FormItem label={localConsts.COLUMN_InventoryItemId}>
-                  {getFieldDecorator('inventoryItemId', {})(
-                    <Input style={{ width: '290px' }} type="text" />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={11} offset={2}>
-                <FormItem label={localConsts.COLUMN_ProductFeatureId}>
-                  {getFieldDecorator('productFeatureId')(
+                <FormItem label={localConsts.Purpose}>
+                  {getFieldDecorator('purpose', {})(
                     <Input
-                      addonAfter={
-                        <Icon onClick={this.showDrawer8} type="idcard" />
-                      }
-                    />,
+                    type="text"
+                    style={{ width: '295px' }}
+                  />,
                   )}
                 </FormItem>
               </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={11}>
-                <FormItem label={localConsts.COLUMN_ProductId}>
-                  {getFieldDecorator('productId')(
-                    <Input
-                      addonAfter={
-                        <Icon onClick={this.showDrawer7} type="idcard" />
-                      }
-                    />,
+              <Col span={8} offset={2}>
+                <FormItem label={localConsts.Justification }>
+                  {getFieldDecorator('justification', {})(
+                     <Input
+                     type="text"
+                     style={{ width: '295px' }}
+                   />,
                   )}
                 </FormItem>
               </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={24}>
-                <FormItem label={localConsts.COLUMN_Description}>
-                  {getFieldDecorator('description', {})(
-                    <Input.TextArea
-                      type="text"
-                      value={this.state.agreementText}
-                      rows={4}
-                      style={{ width: '795px' }}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
+            
             </Row>
             <Row
               style={{
@@ -1795,42 +1436,24 @@ class BudgetsForm extends Component {
           >
             <Row gutter={20} style={{ marginTop: '30px' }}>
               <Col span={11}>
-                <FormItem label={localConsts.CustomTimePeriodId}>
-                  {getFieldDecorator('Party_ID', {})(
-                    <Input
-                    addonBefore={
-                      <Select defaultValue="Contains">{InvoiceIdType}</Select>
-                    }
-                    addonAfter={
-                      <Popover content="ignore case">
-                        <Checkbox />
-                      </Popover>
-                    }
-                  />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={11} offset={2}>
-                <FormItem label={localConsts.ParentPeriodId}>
-                  {getFieldDecorator('RoleTypeId', {})(
+              <FormItem label={localConsts.PartyID}>
+                  {getFieldDecorator('partyId', {})(
                      <Input
-                     addonBefore={
-                       <Select defaultValue="Contains">{InvoiceIdType}</Select>
-                     }
+                     style={{ width: '295px' }}
+                     onBlur={this.enableSaveButton}
                      addonAfter={
-                       <Popover content="ignore case">
-                         <Checkbox />
-                       </Popover>
+                       <Icon
+                         onClick={this.showDrawer4}
+                         type="idcard"
+                       />
                      }
                    />,
                   )}
                 </FormItem>
               </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={11}>
-                <FormItem label={localConsts.PeriodTypeId}>
-                  {getFieldDecorator('Percentage', {})(
+              <Col span={11} offset={2}>
+              <FormItem label={localConsts.RoleTypeId_LABEL}>
+                  {getFieldDecorator('roleTypeId', {})(
                       <Select
                       showSearch
                       onBlur={this.enableSaveButton}
@@ -1847,90 +1470,9 @@ class BudgetsForm extends Component {
                   )}
                 </FormItem>
               </Col>
-              <Col span={8} offset={2}>
-                <FormItem label={localConsts.IsClosed}>
-                  {getFieldDecorator('Percentage', {})(
-                      <Select
-                      showSearch
-                      onBlur={this.enableSaveButton}
-                      style={{ width: '295px' }}
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      {}
-                    </Select>,
-                  )}
-                </FormItem>
-              </Col>
-              </Row>
-              <Row gutter={20} >
-              <Col span={11}>
-                <FormItem label={localConsts.PeriodNum}>
-                  {getFieldDecorator('Party_ID', {})(
-                    <Input
-                    addonBefore={
-                      <Select defaultValue="Contains">{InvoiceIdType}</Select>
-                    }
-                    addonAfter={
-                      <Popover content="ignore case">
-                        <Checkbox />
-                      </Popover>
-                    }
-                  />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={11} offset={2}>
-                <FormItem label={localConsts.PeriodName}>
-                  {getFieldDecorator('RoleTypeId', {})(
-                     <Input
-                     addonBefore={
-                       <Select defaultValue="Contains">{InvoiceIdType}</Select>
-                     }
-                     addonAfter={
-                       <Popover content="ignore case">
-                         <Checkbox />
-                       </Popover>
-                     }
-                   />,
-                  )}
-                </FormItem>
-              </Col>
             </Row>
-              <Row gutter={20}> 
-              <Col span={11}>
-                <FormItem label={localConsts.FromDate_LABEL}>
-                  {getFieldDecorator('from_Date', {
-                    initialValue: moment(),
-                    enableReinitialize: true,
-                  })(
-                    <DatePicker
-                      onBlur={this.enableSaveButton}
-                      style={{ width: '295px' }}
-                      onChange={this.onChange}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={8} offset={2}>
-                <FormItem label={localConsts.ThroughDate}>
-                  {getFieldDecorator('ThroughDate', {
-                    initialValue: moment(),
-                    enableReinitialize: true,
-                  })(
-                    <DatePicker
-                      // onBlur={this.enableSaveButton}
-                      style={{ width: '295px' }}
-                      onChange={this.onChange}
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
+            
+              
             <Row
               style={{
                 borderTop: '1px dashed #E3E7F1',
@@ -2304,16 +1846,16 @@ class BudgetsForm extends Component {
             </Row>
           </Drawer>
           <Drawer
-            title={localConsts.LookupProductFeature_title}
+            // title={localConsts.LookupProductFeature_title}
             width="709px"
             placement="right"
             closable={true}
             onClose={this.onClose8}
             visible={this.state.visible8}
           >
-            <Row gutter={20}>
+            <Row gutter={20} style={{marginTop:'30px'}}>
               <Col span={11}>
-                <FormItem label={localConsts.ProductFeatureId}>
+                <FormItem label={localConsts.CustomTimePeriodId}>
                   {getFieldDecorator('ProductFeatureId', {})(
                     <Input
                       addonBefore={
@@ -2329,7 +1871,7 @@ class BudgetsForm extends Component {
                 </FormItem>
               </Col>
               <Col span={11} offset={2}>
-                <FormItem label={localConsts.ProductFeatureTypeId}>
+                <FormItem label={localConsts.PeriodTypeId}>
                   {getFieldDecorator('ProductFeatureTypeId', {})(
                     <Select
                       showSearch
@@ -2349,25 +1891,23 @@ class BudgetsForm extends Component {
             </Row>
             <Row gutter={20}>
               <Col span={11}>
-                <FormItem label={localConsts.ProductFeatureCategoryId}>
-                  {getFieldDecorator('ProductFeatureCategoryId', {})(
-                    <Select
-                      showSearch
-                      style={{ width: '302px' }}
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.props.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
+              <FormItem label={localConsts.ParentPeriodId}>
+                  {getFieldDecorator('ProductFeatureId', {})(
+                    <Input
+                      addonBefore={
+                        <Select defaultValue="Contains">{InvoiceIdType}</Select>
                       }
-                    >
-                      {}
-                    </Select>,
+                      addonAfter={
+                        <Popover content="ignore case">
+                          <Checkbox />
+                        </Popover>
+                      }
+                    />,
                   )}
                 </FormItem>
               </Col>
               <Col span={11} offset={2}>
-                <FormItem label={localConsts.Description}>
+                <FormItem label={localConsts.PeriodNum}>
                   {getFieldDecorator('Description', {})(
                     <Input
                       addonBefore={
@@ -2385,7 +1925,7 @@ class BudgetsForm extends Component {
             </Row>
             <Row gutter={20}>
               <Col span={11}>
-                <FormItem label={localConsts.UOM}>
+                <FormItem label={localConsts.PeriodName}>
                   {getFieldDecorator('UOM', {})(
                     <Input
                       addonBefore={
@@ -2403,122 +1943,53 @@ class BudgetsForm extends Component {
             </Row>
             <Row gutter={20}>
               <Col span={11}>
-                <FormItem label={localConsts.NumberSpecifiedfrom}>
-                  {getFieldDecorator('To_Date', {})(
-                    <InputGroup compact style={{ display: 'flex' }}>
-                      <Input
-                        onChange={this.onChange}
-                        style={{ width: '250px' }}
-                      />
-                      <Select defaultValue="Less Than">{To_Date_Const}</Select>
-                    </InputGroup>,
-                  )}
+                <FormItem label={localConsts.FromDate_LABEL}>
+                {getFieldDecorator('FromDate', {
+                          initialValue: moment(),
+                          enableReinitialize: true,
+                        })(
+                          <DatePicker
+                            style={{ width: '295px' }}
+                            onChange={this.onChange}
+                          />,
+                        )}
                 </FormItem>
               </Col>
               <Col span={11} offset={2}>
-                <FormItem label={localConsts.NumberSpecifiedTo}>
-                  {getFieldDecorator('To_Date', {})(
-                    <InputGroup compact style={{ display: 'flex' }}>
-                      <Input
-                        onChange={this.onChange}
-                        style={{ width: '250px' }}
-                      />
-                      <Select defaultValue="Less Than">{To_Date_Const}</Select>
-                    </InputGroup>,
-                  )}
+                <FormItem label={localConsts.ThroughDate_LABEL}>
+                {getFieldDecorator('FromDate', {
+                          initialValue: moment(),
+                          enableReinitialize: true,
+                        })(
+                          <DatePicker
+                            style={{ width: '295px' }}
+                            onChange={this.onChange}
+                          />,
+                        )}
                 </FormItem>
               </Col>
             </Row>
             <Row gutter={20}>
               <Col span={11}>
-                <FormItem label={localConsts.DefaultAmountfrom}>
+                <FormItem label={localConsts.IsClosed}>
                   {getFieldDecorator('DefaultAmountTo', {})(
-                    <InputGroup compact style={{ display: 'flex' }}>
-                      <Input
-                        onChange={this.onChange}
-                        style={{ width: '250px' }}
-                      />
-                      <Select defaultValue="Less Than">{To_Date_Const}</Select>
-                    </InputGroup>,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={11} offset={2}>
-                <FormItem label={localConsts.DefaultAmountTo}>
-                  {getFieldDecorator('DefaultAmountTo', {})(
-                    <InputGroup compact style={{ display: 'flex' }}>
-                      <Input
-                        onChange={this.onChange}
-                        style={{ width: '250px' }}
-                      />
-                      <Select defaultValue="Less Than">{To_Date_Const}</Select>
-                    </InputGroup>,
+                    <Select
+                    showSearch
+                    style={{ width: '302px' }}
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option.props.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    {}
+                  </Select>,
                   )}
                 </FormItem>
               </Col>
             </Row>
-            <Row gutter={20}>
-              <Col span={11}>
-                <FormItem label={localConsts.DefaultSequenceNumfrom}>
-                  {getFieldDecorator('To_Date', {})(
-                    <InputGroup compact style={{ display: 'flex' }}>
-                      <Input
-                        onChange={this.onChange}
-                        style={{ width: '250px' }}
-                      />
-                      <Select defaultValue="Less Than">{To_Date_Const}</Select>
-                    </InputGroup>,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={11} offset={2}>
-                <FormItem label={localConsts.DefaultSequenceNumTo}>
-                  {getFieldDecorator('To_Date', {})(
-                    <InputGroup compact style={{ display: 'flex' }}>
-                      <Input
-                        onChange={this.onChange}
-                        style={{ width: '250px' }}
-                      />
-                      <Select defaultValue="Less Than">{To_Date_Const}</Select>
-                    </InputGroup>,
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-            <Row gutter={20}>
-              <Col span={11}>
-                <FormItem label={localConsts.Abbrev}>
-                  {getFieldDecorator('Abbrev', {})(
-                    <Input
-                      addonBefore={
-                        <Select defaultValue="Contains">{InvoiceIdType}</Select>
-                      }
-                      addonAfter={
-                        <Popover content="ignore case">
-                          <Checkbox />
-                        </Popover>
-                      }
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={11} offset={2}>
-                <FormItem label={localConsts.IdCode}>
-                  {getFieldDecorator('IdCode', {})(
-                    <Input
-                      addonBefore={
-                        <Select defaultValue="Contains">{InvoiceIdType}</Select>
-                      }
-                      addonAfter={
-                        <Popover content="ignore case">
-                          <Checkbox />
-                        </Popover>
-                      }
-                    />,
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
+           
             <Row
               style={{
                 marginTop: '15',
@@ -2571,8 +2042,9 @@ export default Form.create()(
   connect(({ Budgets_Accounting }) => ({
     dataById: [],
     data: Budgets_Accounting.reducerSave,
-    InvoiceItem: Budgets_Accounting.reducerSaveInvoiceItem,
-    InvoiceRole: Budgets_Accounting.reducerSaveInvoiceRole,
-    InvoiceTerm: Budgets_Accounting.reducerSaveInvoiceTerm,
+    Item: Budgets_Accounting.reducerSaveItem,
+    Role: Budgets_Accounting.reducerSaveRole,
+    RemoveRole : Budgets_Accounting.reducerRemoveRole,
+    Reviews: Budgets_Accounting.reducerSaveReviews,
   }))(BudgetsForm),
 );

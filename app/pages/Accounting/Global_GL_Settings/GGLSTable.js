@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Table, Button, Icon, Input, Select } from 'antd';
+import { Table, Button, Icon, Popconfirm, Input, Badge } from 'antd';
 import TableOptions from '../../../common/Table/TableOptions';
-import BudgetsSearchForm from './BudgetsSearchForm';
+// import GGLSSearchForm from './GGLSSearchForm';
 import * as actionConsts from '../../../common/TitlePane/ActionConsts';
-import * as localConsts from './BudgetsConsts';
+import * as localConsts from './GGLSConsts';
 import styles from '../../../common/Styles.less';
 const ButtonGroup = Button.Group;
-class BudgetsTable extends Component {
+class GGLSTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      invoiceData: [],
       selectedRowKeys: [],
       selectedObjects: [],
       loading: false,
@@ -24,19 +23,17 @@ class BudgetsTable extends Component {
       expandableValue: this.expandedRowRenderPanel,
       rowSelectionValue: true,
       paginationValue: { position: 'bottom' },
-      currentStatus: '',
-      disabled: true,
-      defaultValue: 'NA',
-      budget : []
+      Data: [],
     };
   }
   componentWillReceiveProps(nextProps) {
-    this.setState({ loading: false });
+    console.log(nextProps);
     if (nextProps.data != undefined) {
       var tmp = [];
-      tmp.push({ budgetId: nextProps.data.budgetId });
-      this.setState({ budget: tmp, budgetId: nextProps.data.budgetId });
+      tmp.push({ authCode: nextProps.data.authCode });
+      this.setState({ Data: tmp });
     }
+    this.setState({ loading: false });
   }
   componentDidMount() {
     this.props.setClick(value => {
@@ -46,34 +43,6 @@ class BudgetsTable extends Component {
       this.toggleTableRowsSelectedClear();
     });
   }
-  start = () => {
-    this.setState({ loading: true });
-    var id = this.state.invoiceData[0].invoiceId;
-    var temp = [];
-    temp.push(id);
-    var obj = {
-      invoiceIds: temp,
-      statusId: this.state.currentStatus,
-    };
-    this.props.handleSubmitAction(
-      actionConsts.ACTION_TYPE_SAVE_MASSCHANGE_INVOICE_STATUS,
-      obj,
-    );
-    setTimeout(() => {
-      this.setState({
-        selectedRowKeys: [],
-        loading: false,
-      });
-    }, 1000);
-  };
-  handleChange = value => {
-    this.setState({ currentStatus: value });
-    if (this.state.selectedRowKeys.length > 0 && value != 'NA') {
-      this.setState({ disabled: false });
-    } else {
-      this.setState({ disabled: true });
-    }
-  };
   render() {
     const {
       selectedRowKeys,
@@ -85,11 +54,7 @@ class BudgetsTable extends Component {
     } = this.state;
     let { data } = this.props;
     data = data.content || [];
-    const StatusTypeConst = localConsts.statusConst.map(k => (
-      <Option key={k.label} value={k.value}>
-        {k.label}
-      </Option>
-    ));
+    console.log(this.props);
     const rowSelection = rowSelectionValue
       ? {
           selectedRowKeys,
@@ -115,12 +80,12 @@ class BudgetsTable extends Component {
             rowKey="id"
             title={this.tableHeader}
             columns={this.tableColumns}
-            dataSource={this.state.budget}
+            loading={this.state.loading}
+            dataSource={this.state.Data}
             size="small"
             bordered={borderedValue}
             showHeader={showHeaderValue}
-            scroll={{ x: 900 }}
-            rowSelection={rowSelection}
+            scroll={{ x: 1300 }}
             pagination={paginationProps}
             onChange={this.handleStandardTableChange}
           />
@@ -130,10 +95,10 @@ class BudgetsTable extends Component {
   }
   tableColumns = [
     {
-      title: `${localConsts.BudgetId}`,
-      dataIndex: 'budgetId',
-      key: 'budgetId',
-      width: 130,
+      title: `${localConsts.Code}`,
+      dataIndex: 'authCode',
+      key: 'authCode',
+      width: 100,
       fixed: 'left',
       sorter: (a, b) => a.name.length - b.name.length,
       filterDropdown: ({
@@ -198,7 +163,7 @@ class BudgetsTable extends Component {
         return searchText ? (
           searchText.match(numbers) ? (
             <div>
-              {/* <Badge size="large" status="none" className={badgeType} /> */}
+              <Badge size="large" status="none" className={badgeType} />
               <Button
                 className={styles.anchorNameStyle}
                 onClick={() => {
@@ -281,7 +246,7 @@ class BudgetsTable extends Component {
                   actionConsts.ACTION_TYPE_SINGLE_SELECTION,
                   data,
                 );
-               this.props.toggleView();
+                this.props.toggleView();
               }}
             >
               {text}
@@ -292,18 +257,44 @@ class BudgetsTable extends Component {
       },
     },
     {
-      title: `${localConsts.BudgetTypeId}`,
+      title: `${localConsts.AccountName}`,
       dataIndex: 'Invoice Type',
       sorter: (a, b) => a.shortName.length - b.shortName.length,
     },
     {
-      title: `${localConsts.CustomTimePeriodId}`,
+      title: `${localConsts.ParentGlAccountId}`,
       dataIndex: 'Invoice Date',
     },
     {
-      title: `${localConsts.Comments}`,
+      title: `${localConsts.GlAccountTypeId}`,
       dataIndex: 'ToParty',
     },
+    {
+      title: `${localConsts.GlAccountClassId}`,
+      dataIndex: 'FromParty',
+    },
+    {
+      title: `${localConsts.GlResourceTypeId}`,
+      dataIndex: 'status',
+    },
+    {
+      title: `${localConsts.GlXbrlClassId}`,
+      dataIndex: 'status',
+    },
+    {
+      title: `${localConsts.description_LABEL}`,
+      dataIndex: 'status',
+    },
+    {
+      title: `${localConsts.COLUMN_ProductId}`,
+      dataIndex: 'status',
+    },
+    {
+      title: `${localConsts.ExternalId}`,
+      dataIndex: 'status',
+    },
+    
+    
   ];
   expandedRowRenderPanel = record => (
     <div>
@@ -321,7 +312,7 @@ class BudgetsTable extends Component {
         handleTableProperties={this.handleTableProperties}
         handleSubmitAction={this.props.handleSubmitAction}
         handleLazyDataLoading={this.handleLazyDataLoading}
-        searchForm={BudgetsSearchForm}
+        // searchForm={GGLSSearchForm}
       />
     </div>
   );
@@ -471,13 +462,15 @@ class BudgetsTable extends Component {
     this.setState({ searchText: '' });
   };
 }
-BudgetsTable.propTypes = {
+GGLSTable.propTypes = {
   setClick: PropTypes.func,
+  handleSubmitAction: PropTypes.func,
   data: PropTypes.any,
   toggleEdit: PropTypes.func,
   toggleView: PropTypes.func,
   clearSelected: PropTypes.func,
 };
-export default connect(({ Budgets_Accounting }) => ({
-  data: Budgets_Accounting.reducerSave,
-}))(BudgetsTable);
+
+export default connect(({ GGLS_Accounting }) => ({
+  data: GGLS_Accounting.reducerSaveAuthTransaction,
+}))(GGLSTable);

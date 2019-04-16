@@ -12,6 +12,8 @@ export function submitAction(
     urlString = `${nameSpace}/actionExists`;
   } else if (actionType === 'save') {
     urlString = `${nameSpace}/actionSave`;
+  }else if (actionType === 'update') {
+    urlString = `${nameSpace}/actionUpdate`;
   } else if (actionType === 'updateAgreement') {
     urlString = `${nameSpace}/actionUpdateAgreement`;
   } else if (actionType === 'saveAgreement') {
@@ -244,11 +246,116 @@ export function submitAction(
   else if (actionType === 'updateParties') {
     urlString = `${nameSpace}/actionUpdateParties`;
   } 
+
+  else if (actionType === 'saveReviews') {
+    urlString = `${nameSpace}/actionSaveReviews`;
+  }
+  else if (actionType === 'removeReviews') {
+    urlString = `${nameSpace}/actionRemoveReviews`;
+  }
   else if (actionType === 'delPaties') {
     urlString = `${nameSpace}/actionDelParties`;
   } 
+  else if (actionType === 'saveItem') {
+    urlString = `${nameSpace}/actionSaveItem`;
+  }
+  else if (actionType === 'removeItem') {
+    urlString = `${nameSpace}/actionRemoveItem`;
+  }
+  else if (actionType === 'saveRole') {
+    urlString = `${nameSpace}/actionSaveRole`;
+  }
+  else if (actionType === 'saveFAprod') {
+    urlString = `${nameSpace}/actionSaveFAprod`;
+  }
+  else if (actionType === 'removeRole') {
+    urlString = `${nameSpace}/actionRemoveRole`;
+  }
+  else if (actionType === 'updateBudgetStatus') {
+    urlString = `${nameSpace}/actionBudgetStatus`;
+  } 
+  else if (actionType === 'updateFixedAsset') {
+    urlString = `${nameSpace}/actionUpdateFA`;
+  }
 
-
+  else if (actionType === 'updateFAprod') {
+    urlString = `${nameSpace}/actionUpdateFAprod`;
+  }
+  else if (actionType === 'addIDEN') {
+    urlString = `${nameSpace}/actionAddIDEN`;
+  }
+  else if (actionType === 'updateIDEN') {
+    urlString = `${nameSpace}/actionUpdateIDEN`;
+  }
+  else if (actionType === 'removeIDEN') {
+    urlString = `${nameSpace}/actionRemoveIDEN`;
+  } 
+  else if (actionType === 'addReg') {
+    urlString = `${nameSpace}/actionAddReg`;
+  } 
+  else if (actionType === 'updateReg') {
+    urlString = `${nameSpace}/actionUpdateReg`;
+  } 
+  else if (actionType === 'removeReg') {
+    urlString = `${nameSpace}/actionRemoveReg`;
+  } 
+  else if (actionType === 'addMR') {
+    urlString = `${nameSpace}/actionAddMR`;
+  } 
+  else if (actionType === 'updateMR') {
+    urlString = `${nameSpace}/actionUpdateMR`;
+  } 
+  else if (actionType === 'removeMR') {
+    urlString = `${nameSpace}/actionRemoveMR`;
+  } 
+  else if (actionType === 'removeFAprod') {
+    urlString = `${nameSpace}/actionRemoveFAprod`;
+  }
+  else if (actionType === 'addFASC') {
+    urlString = `${nameSpace}/actionSaveFASC`;
+  }
+  else if (actionType === 'updateFASC') {
+    urlString = `${nameSpace}/actionUpdateFASC`;
+  }
+  else if (actionType === 'addMAINT') {
+    urlString = `${nameSpace}/actionAddMaint`;
+  }
+  else if (actionType === 'removeMAINT') {
+    urlString = `${nameSpace}/actionRemoveMaint`;
+  }
+  else if (actionType === 'addAssign') {
+    urlString = `${nameSpace}/actionAddAssign`;
+  }
+  else if (actionType === 'updateAssign') {
+    urlString = `${nameSpace}/actionUpdateAssign`;
+  }
+  else if (actionType === 'removeAssign') {
+    urlString = `${nameSpace}/actionRemoveAssign`;
+  }
+  else if (actionType === 'saveDEP') {
+    urlString = `${nameSpace}/actionSaveDep`;
+  }
+  else if (actionType === 'saveGLMAP') {
+    urlString = `${nameSpace}/actionSaveGLMAP`;
+  }
+  else if (actionType === 'removeGL') {
+    urlString = `${nameSpace}/actionRemoveGL`;
+  }
+  else if (actionType === 'updateMAINT') {
+    urlString = `${nameSpace}/actionUpdateMAINT`;
+  }
+  else if (actionType === 'removeDEP') {
+    urlString = `${nameSpace}/actionRemoveDep`;
+  }
+  else if (actionType === 'removeFASC') {
+    urlString = `${nameSpace}/actionRemoveFASC`;
+  }
+  else if (actionType === 'removeMO') {
+    urlString = `${nameSpace}/actionRemoveMO`;
+  }
+  else if (actionType === 'saveMO') {
+    urlString = `${nameSpace}/actionSaveMO`;
+  }
   else if (actionType === 'deleteAll') {
     urlString = `${nameSpace}/actionDeleteAll`;
   } else if (actionType === 'statesByCountryList') {

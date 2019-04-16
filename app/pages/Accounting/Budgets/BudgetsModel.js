@@ -1,10 +1,13 @@
 import {
   serviceSave,
-  serviceUpdateInvoice,
-  serviceCopyInvoice,
-  servieSetInvoiceStatus,
-  serviceMassChangeInvoiceStatus,
-  serviceCreateInvoiceItem,
+  serviceUpdate,
+  serviceBudgetStatus,
+  serviceSaveItem,
+  serviceRemoveItem,
+  serviceRemoveRole,
+  serviceSaveRole,
+  serviceSaveReviews,
+  serviceRemoveReviews,
   serviceRemoveInvoiceItem,
   serviceCreateInvoiceRole,
   serviceRemoveInvoiceRole,
@@ -18,11 +21,13 @@ export default {
 
   state: {
     reducerSave: [],
+    reducerSaveReviews:[],
+    reducerSaveItem:[],
     reducerUpdateInvoice: [],
     reducerSaveSetInvoiceStatus: [],
     reducerSaveInvoiceItem: [],
-    reducerSaveInvoiceRole: [],
-    reducerSaveInvoiceTerm: [],
+    reducerSaveRole: [],
+    reducerRemoveRole: [],
   },
 
   effects: {
@@ -38,21 +43,34 @@ export default {
         message.success(response.data.successMessage, 4);
       } else message.error(response.data.errorMessage, 4);
     },
-    *actionUpdateInvoice({ payload }, { call, put }) {
-      const response = yield call(serviceUpdateInvoice, payload);
+    *actionUpdate({ payload }, { call, put }) {
+      const response = yield call(serviceUpdate, payload);
       yield put({
-        type: 'reducerUpdateInvoice',
+        type: 'reducerUpdate',
         payload: response.data || [],
       });
 
       if (response.data.responseMessage === 'success') {
-        message.success('Invoice updated ', 4);
+        message.success(response.data.successMessage, 4);
       } else message.error(response.data.errorMessage, 4);
     },
-    *actionSaveCopyInvoice({ payload }, { call, put }) {
-      const response = yield call(serviceCopyInvoice, payload);
+    *actionBudgetStatus({ payload }, { call, put }) {
+      const response = yield call(serviceBudgetStatus, payload);
+     console.log(response);
       yield put({
-        type: 'reducerSave',
+        type: 'reducerBudgetStatus',
+        payload: response.data || [],
+      });
+
+      if (response.data.responseMessage === 'success') {
+        message.success(response.data.successMessage, 4);
+      } else message.error(response.data.errorMessage, 4);
+    },
+    *actionSaveItem({ payload }, { call, put }) {
+      const response = yield call(serviceSaveItem, payload);
+     console.log(response);
+      yield put({
+        type: 'reducerSaveItem',
         payload: response.data || [],
       });
 
@@ -60,37 +78,38 @@ export default {
         message.success(response.data.successMessage);
       } else message.error(response.data.errorMessage, 4);
     },
-    *actionSetInvoiceStatus({ payload }, { call, put }) {
-      const response = yield call(servieSetInvoiceStatus, payload);
+    *actionRemoveItem({ payload }, { call, put }) {
+      const response = yield call(serviceRemoveItem, payload);
       yield put({
-        type: 'reducerSaveSetInvoiceStatus',
+        type: 'reducerSaveItem',
         payload: response.data || [],
       });
 
       if (response.data.responseMessage === 'success') {
-        message.success('InvoiceStatus changed successfully');
+        message.success(response.data.successMessage);
       } else message.error(response.data.errorMessage, 4);
     },
-    *actionSaveMassChangeInvoiceStatus({ payload }, { call, put }) {
-      const response = yield call(serviceMassChangeInvoiceStatus, payload);
+    *actionSaveRole({ payload }, { call, put }) {
+      const response = yield call(serviceSaveRole, payload);
+      console.log(response);
       yield put({
-        type: 'SaveMassChangeInvoiceStatus',
+        type: 'reducerSaveRole',
         payload: response.data || [],
       });
 
       if (response.data.responseMessage === 'success') {
-        message.success(response.data.errorMessage);
+        message.success(response.data.successMessage);
       } else message.error(response.data.errorMessageList, 4);
     },
-    *actionCreateInvoiceItem({ payload }, { call, put }) {
-      const response = yield call(serviceCreateInvoiceItem, payload);
+    *actionRemoveRole({ payload }, { call, put }) {
+      const response = yield call(serviceRemoveRole, payload);
       yield put({
-        type: 'reducerSaveInvoiceItem',
+        type: 'reducerRemoveRole',
         payload: response.data || [],
       });
 
       if (response.data.responseMessage === 'success') {
-        message.success('Invoice Item Created');
+        message.success(response.data.successMessage);
       } else message.error(response.data.errorMessageList, 4);
     },
     *actionRemoveInvoiceItem({ payload }, { call, put }) {
@@ -104,16 +123,17 @@ export default {
         message.success('Invoice Item deleted');
       } else message.error(response.data.errorMessageList, 4);
     },
-    *actionCreateInvoiceRole({ payload }, { call, put }) {
-      const response = yield call(serviceCreateInvoiceRole, payload);
+    *actionSaveReviews({ payload }, { call, put }) {
+      const response = yield call(serviceSaveReviews, payload);
+      console.log(response);
       yield put({
-        type: 'reducerSaveInvoiceRole',
+        type: 'reducerSaveReviews',
         payload: response.data || [],
       });
 
       if (response.data.responseMessage === 'success') {
-        message.success('role');
-      } else message.error(response.data.errorMessageList, 4);
+        message.success(response.data.successMessage);
+      } else message.error(response.data.errorMessage, 4);
     },
     *actionUpdateInvoiceRole({ payload }, { call, put }) {
       const response = yield call(serviceUpdateInvoiceRole, payload);
@@ -126,15 +146,16 @@ export default {
         message.success('role');
       } else message.error(response.data.errorMessageList, 4);
     },
-    *actionRemoveInvoiceRole({ payload }, { call, put }) {
-      const response = yield call(serviceRemoveInvoiceRole, payload);
+    *actionRemoveReviews({ payload }, { call, put }) {
+      const response = yield call(serviceRemoveReviews, payload);
+      console.log(response);
       yield put({
-        type: 'reducerSaveInvoiceRole',
+        type: 'reducerSaveReviews',
         payload: response.data || [],
       });
 
       if (response.data.responseMessage === 'success') {
-        message.success('role');
+        message.success(response.data.successMessage);
       } else message.error(response.data.errorMessageList, 4);
     },
     *actionCreateInvoiceTerm({ payload }, { call, put }) {
@@ -179,22 +200,28 @@ export default {
         reducerSaveSetInvoiceStatus: action.payload,
       };
     },
-    reducerSaveInvoiceItem(state, action) {
+    reducerSaveItem(state, action) {
       return {
         ...state,
-        reducerSaveInvoiceItem: action.payload,
+        reducerSaveItem: action.payload,
       };
     },
-    reducerSaveInvoiceRole(state, action) {
+     reducerSaveReviews(state, action) {
       return {
         ...state,
-        reducerSaveInvoiceRole: action.payload,
+        reducerSaveReviews: action.payload,
       };
     },
-    reducerSaveInvoiceTerm(state, action) {
+    reducerSaveRole(state, action) {
       return {
         ...state,
-        reducerSaveInvoiceTerm: action.payload,
+        reducerSaveRole: action.payload,
+      };
+    },
+    reducerRemoveRole(state, action) {
+      return {
+        ...state,
+        reducerRemoveRole: action.payload,
       };
     },
   },

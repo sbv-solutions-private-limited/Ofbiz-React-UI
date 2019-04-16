@@ -25,10 +25,8 @@ export const ToPartyID_PLACEHOLDER = 'Enter To Party ID';
 export const InvoiceType_LABEL = 'Invoice Type';
 export const InvoiceType_PLACEHOLDER = 'select Invoice Type';
 export const InvoiceTypeConst = [
-  { value: 'COMMISSION_INVOICE', label: 'Commission' },
-  { value: 'PURCHASE_INVOICE', label: 'Purchase Return' },
-  { value: 'CUST_RTN_INVOICE', label: 'Sales Invoice' },
-];
+  { value: 'REQUIREMENT_BUDGET_A', label: 'Requirement' },
+  ];
 export const InvoiceTypeConst1 = [
   { value: 'INTEREST_INVOICE', label: 'Interes' },
   { value: 'PURC_RTN_INVOICE', label: 'Purchase Return' },
@@ -208,7 +206,6 @@ export const Status_Invoice_tags = [
   'Write Off',
   'Cancelled',
 ];
-export const LookupProductFeature_title = 'Lookup Product Feature';
 export const ProductFeatureId = 'Product Feature Id';
 export const ProductFeatureTypeId = ' Product Feature Type Id ';
 export const ProductFeatureCategoryId = 'Product Feature Category Id';
@@ -244,3 +241,12 @@ export const PeriodTypeId	 = 'Period Type Id	';
 export const PeriodNum	 = 'Period Num	';
 export const IsClosed	 = 'Is Closed	';
 export const PeriodName	 = 'Period Name	';
+
+export const Justification = 'Justification';
+export const Purpose ='Purpose';
+export const BudgetItemSeqId = 'BudgetItemSeqId';
+export const BudgetItemTypeId  = 'Budget Item Type Id ';
+export const  BudgetReviewId  = 'Budget Review Id ';
+export const  BudgetReviewResult  = 'Budget Review Result ';
+export const  ReviewDate  = 'Review Date ';
+
