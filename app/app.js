@@ -13,6 +13,7 @@ import dva from 'dva';
 
 // import createLoading from 'dva-loading';
 // Import all the third party stuff
+// import createHistory from 'history/createBrowserHistory';
 import createHistory from 'history/createBrowserHistory';
 
 // Load the favicon and the .htaccess file
@@ -52,6 +53,9 @@ app.model(require('./pages/Accounting/BillingAccount/BillingAccountModel').defau
 app.model(require('./pages/Accounting/FinancialAccount/FinancialAccountModel').default);
 app.model(require('./pages/Accounting/TaxAuthorities/TaxAuthModel').default);
 app.model(require('./pages/Accounting/Budgets/BudgetsModel').default);
+app.model(require('./pages/Accounting/FixedAssets/FixedAssetsModel').default);
+app.model(require('./pages/Accounting/Global_GL_Settings/GGLSModel').default);
+
 app.start('#app');
 
 // Install ServiceWorker and AppCache in the end since

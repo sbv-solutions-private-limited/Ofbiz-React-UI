@@ -14,6 +14,8 @@ import BillingAccountsView from '../pages/Accounting/BillingAccount';
 import FinancialAccountView from '../pages/Accounting/FinancialAccount';
 import TaxAuthView from '../pages/Accounting/TaxAuthorities'
 import BudgetsView from '../pages/Accounting/Budgets';
+import FixedAssetsView from '../pages/Accounting/FixedAssets';
+import GGLSView from '../pages/Accounting/Global_GL_Settings/index';
 // Accounting-AR
 import InvoiceViewAR from '../pages/Accounting(AR)/Invoice';
 import PaymentViewAR from '../pages/Accounting(AR)/Payment';
@@ -73,9 +75,9 @@ const menuData = [
       { name: 'Financial Account', path: 'FinancialAccount', component: FinancialAccountView },
       { name: 'Tax Authorities', path: 'TaxAuthorities', component: TaxAuthView },
       { name: 'Agreements', path: 'Agreements', component: AgreementsView },
-      { name: 'Fixed Assets', path: 'FixedAssets', component: NA },
+      { name: 'Fixed Assets', path: 'FixedAssets', component: FixedAssetsView },
       { name: 'Budgets', path: 'Budgets', component: BudgetsView },
-      { name: 'Global GL Settings', path: 'Global_GL', component: NA },
+      { name: 'Global GL Settings', path: 'globalGLSettings', component: GGLSView },
       {
         name: 'Organization GL Settings',
         path: 'Organization_GL',

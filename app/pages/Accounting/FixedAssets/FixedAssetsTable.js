@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Table, Button, Icon, Input, Select } from 'antd';
+import { Table, Button, Icon, Popconfirm, Input, Badge } from 'antd';
 import TableOptions from '../../../common/Table/TableOptions';
-import BudgetsSearchForm from './BudgetsSearchForm';
+import FixedAssetsSearchForm from './FixedAssetsSearchForm';
 import * as actionConsts from '../../../common/TitlePane/ActionConsts';
-import * as localConsts from './BudgetsConsts';
+import * as localConsts from './FixedAssetsConsts';
 import styles from '../../../common/Styles.less';
 const ButtonGroup = Button.Group;
-class BudgetsTable extends Component {
+class FixedAssetsTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      invoiceData: [],
       selectedRowKeys: [],
       selectedObjects: [],
       loading: false,
@@ -24,18 +23,17 @@ class BudgetsTable extends Component {
       expandableValue: this.expandedRowRenderPanel,
       rowSelectionValue: true,
       paginationValue: { position: 'bottom' },
-      currentStatus: '',
-      disabled: true,
-      defaultValue: 'NA',
-      budget : []
+      FA: [],
+      fixedAssetId:''
     };
   }
   componentWillReceiveProps(nextProps) {
     this.setState({ loading: false });
-    if (nextProps.data != undefined) {
+    console.log(nextProps);
+    if (nextProps.FA != undefined) {
       var tmp = [];
-      tmp.push({ budgetId: nextProps.data.budgetId });
-      this.setState({ budget: tmp, budgetId: nextProps.data.budgetId });
+      tmp.push({ fixedAssetId: nextProps.FA.fixedAssetId });
+      this.setState({ FA: tmp });
     }
   }
   componentDidMount() {
@@ -46,34 +44,6 @@ class BudgetsTable extends Component {
       this.toggleTableRowsSelectedClear();
     });
   }
-  start = () => {
-    this.setState({ loading: true });
-    var id = this.state.invoiceData[0].invoiceId;
-    var temp = [];
-    temp.push(id);
-    var obj = {
-      invoiceIds: temp,
-      statusId: this.state.currentStatus,
-    };
-    this.props.handleSubmitAction(
-      actionConsts.ACTION_TYPE_SAVE_MASSCHANGE_INVOICE_STATUS,
-      obj,
-    );
-    setTimeout(() => {
-      this.setState({
-        selectedRowKeys: [],
-        loading: false,
-      });
-    }, 1000);
-  };
-  handleChange = value => {
-    this.setState({ currentStatus: value });
-    if (this.state.selectedRowKeys.length > 0 && value != 'NA') {
-      this.setState({ disabled: false });
-    } else {
-      this.setState({ disabled: true });
-    }
-  };
   render() {
     const {
       selectedRowKeys,
@@ -85,11 +55,6 @@ class BudgetsTable extends Component {
     } = this.state;
     let { data } = this.props;
     data = data.content || [];
-    const StatusTypeConst = localConsts.statusConst.map(k => (
-      <Option key={k.label} value={k.value}>
-        {k.label}
-      </Option>
-    ));
     const rowSelection = rowSelectionValue
       ? {
           selectedRowKeys,
@@ -109,18 +74,17 @@ class BudgetsTable extends Component {
     };
     return (
       <div>
-        <div>
+        <div className={styles.tableContainerParent}>
           <Table
             className={styles.tableContainer}
             rowKey="id"
             title={this.tableHeader}
             columns={this.tableColumns}
-            dataSource={this.state.budget}
+            dataSource={this.state.FA}
             size="small"
             bordered={borderedValue}
             showHeader={showHeaderValue}
-            scroll={{ x: 900 }}
-            rowSelection={rowSelection}
+            scroll={scrollValue}
             pagination={paginationProps}
             onChange={this.handleStandardTableChange}
           />
@@ -130,11 +94,10 @@ class BudgetsTable extends Component {
   }
   tableColumns = [
     {
-      title: `${localConsts.BudgetId}`,
-      dataIndex: 'budgetId',
-      key: 'budgetId',
-      width: 130,
-      fixed: 'left',
+      title: `${localConsts.FixedAssetId}`,
+      dataIndex: 'fixedAssetId',
+      key: 'fixedAssetId',
+      width: 200,
       sorter: (a, b) => a.name.length - b.name.length,
       filterDropdown: ({
         setSelectedKeys,
@@ -198,7 +161,6 @@ class BudgetsTable extends Component {
         return searchText ? (
           searchText.match(numbers) ? (
             <div>
-              {/* <Badge size="large" status="none" className={badgeType} /> */}
               <Button
                 className={styles.anchorNameStyle}
                 onClick={() => {
@@ -243,7 +205,7 @@ class BudgetsTable extends Component {
             </div>
           ) : (
             <div>
-              {/* <Badge size="large" status="none" className={badgeType} /> */}
+        
               <Button
                 className={styles.anchorNameStyle}
                 onClick={() => {
@@ -268,12 +230,10 @@ class BudgetsTable extends Component {
                       ),
                   )}
               </Button>
-              {/* <span className={styles.anchorCode}>({data.code})</span> */}
             </div>
           )
         ) : (
           <div>
-            {/* <Badge size="large" status="none" className={badgeType} /> */}
             <Button
               className={styles.anchorNameStyle}
               onClick={() => {
@@ -281,28 +241,60 @@ class BudgetsTable extends Component {
                   actionConsts.ACTION_TYPE_SINGLE_SELECTION,
                   data,
                 );
-               this.props.toggleView();
+                this.props.toggleView();
               }}
             >
               {text}
             </Button>
-            {/* <span className={styles.anchorCode}>({data.code})</span> */}
           </div>
         );
       },
     },
     {
-      title: `${localConsts.BudgetTypeId}`,
+      title: `${localConsts.FixedAssetName}`,
       dataIndex: 'Invoice Type',
+     
       sorter: (a, b) => a.shortName.length - b.shortName.length,
     },
     {
-      title: `${localConsts.CustomTimePeriodId}`,
+      title: `${localConsts.FixedAssetTypeId}`,
       dataIndex: 'Invoice Date',
+     
     },
     {
-      title: `${localConsts.Comments}`,
-      dataIndex: 'ToParty',
+      title: `${localConsts.FixedAssetParentId}`,
+      dataIndex: 'Invoice Date',
+      
+    },
+    {
+      title: `${localConsts.DateAcquired}`,
+      dataIndex: 'Invoice Date',
+     
+    },
+    {
+      title: `${localConsts.ExpectedEndOfLife}`,
+      dataIndex: 'Invoice Date',
+     
+    },
+    {
+      title: `${localConsts.PurchaseCost}`,
+      dataIndex: 'Invoice Date',
+     
+    },
+    {
+      title: `${localConsts.SalvageValue	}`,
+      dataIndex: 'Invoice Date',
+      
+    },
+    {
+      title: `${localConsts.Depreciation	}`,
+      dataIndex: 'Invoice Date',
+      
+    },
+    {
+      title: `${localConsts.PlannedPastDepreciationTotal	}`,
+      dataIndex: 'Invoice Date',
+     
     },
   ];
   expandedRowRenderPanel = record => (
@@ -321,7 +313,7 @@ class BudgetsTable extends Component {
         handleTableProperties={this.handleTableProperties}
         handleSubmitAction={this.props.handleSubmitAction}
         handleLazyDataLoading={this.handleLazyDataLoading}
-        searchForm={BudgetsSearchForm}
+        searchForm={FixedAssetsSearchForm}
       />
     </div>
   );
@@ -471,13 +463,15 @@ class BudgetsTable extends Component {
     this.setState({ searchText: '' });
   };
 }
-BudgetsTable.propTypes = {
+FixedAssetsTable.propTypes = {
   setClick: PropTypes.func,
+  handleSubmitAction: PropTypes.func,
   data: PropTypes.any,
   toggleEdit: PropTypes.func,
   toggleView: PropTypes.func,
   clearSelected: PropTypes.func,
 };
-export default connect(({ Budgets_Accounting }) => ({
-  data: Budgets_Accounting.reducerSave,
-}))(BudgetsTable);
+export default connect(({ FixedAssets_Accounting }) => ({
+  data: [],
+  FA: FixedAssets_Accounting.reducerSave,
+}))(FixedAssetsTable);
